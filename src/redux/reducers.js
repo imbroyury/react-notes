@@ -1,3 +1,4 @@
+import uuidv4 from 'uuid/v4';
 import { ADD_NOTE, DEL_NOTE, EDIT_NOTE, UPDATE_SEARCH_QUERY, SWITCH_NOTE_MODE, CHANGE_SORT_BY, CHANGE_SORT_ORDER } from './actions';
 import { combineReducers } from 'redux-immutable';
 
@@ -60,7 +61,7 @@ function addNote(notes, action) {
     return notes.push(Immutable.Map({
         title: action.title,
         body: action.body,
-        id: action.id,
+        id: uuidv4(),
         updatedAt: new Date().toISOString(),
         editMode: false
     }));

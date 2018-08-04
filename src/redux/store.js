@@ -1,7 +1,12 @@
-import { createStore } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
 import notesApp from './reducers';
 
-export const store = createStore(notesApp);
+import thunk from 'redux-thunk';
+
+export const store = createStore(
+    notesApp,
+    applyMiddleware(thunk)
+  );
 
 store.subscribe(() => {
     console.log('-***- subscription fired -***-');

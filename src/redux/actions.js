@@ -1,5 +1,3 @@
-import uuidv4 from 'uuid/v4';
-
 export const ADD_NOTE = 'ADD_NOTE';
 export const DEL_NOTE = 'DEL_NOTE';
 export const SWITCH_NOTE_MODE = 'SWITCH_NOTE_MODE';
@@ -12,8 +10,7 @@ export function addNote(title, body) {
     return {
         type: ADD_NOTE,
         title,
-        body,
-        id: uuidv4()
+        body
     }
 }
 

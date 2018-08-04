@@ -44,34 +44,32 @@ const mapStateToProps = state => {
     }
 }
 
+// PROBLEM : DISPATCHING 2 ACTIONS PER VALUE CHANGE
+// SOLUTION : THUNKS ????
+
+const changeSortProps = (sortBy, sortOrder) => dispatch => {
+    dispatch(changeSortBy(sortBy));
+    dispatch(changeSortOrder(sortOrder));
+};
+
 const mapDispatchToProps = dispatch => ({
     handleSortChange: e => {
         switch (e.target.value) {
             case 'newest':
-                dispatch(changeSortBy('updatedAt'));
-                dispatch(changeSortOrder('descending'));
-                break;
+                return dispatch(changeSortProps('updatedAt', 'descending'));
             case 'oldest':
-                dispatch(changeSortBy('updatedAt'));
-                dispatch(changeSortOrder('ascending'));
-                break;
+                return dispatch(changeSortProps('updatedAt', 'ascending'));
             case 'a-z':
-                dispatch(changeSortBy('title'));
-                dispatch(changeSortOrder('ascending'));
-                break;
+                return dispatch(changeSortProps('title', 'ascending'));
             case 'z-a':
-                dispatch(changeSortBy('title'));
-                dispatch(changeSortOrder('descending'));
-                break;
+                return dispatch(changeSortProps('title', 'descending'));
             default:
-                dispatch(changeSortBy('title'));
-                dispatch(changeSortOrder('ascending'));
+                return dispatch(changeSortProps('title', 'ascending'));
         }
     }
-})
+});
 
 function SortControl(props) {
-
     return (
         <Paper className={props.classes.paper}>
             <h2>Sort</h2>
@@ -93,9 +91,7 @@ function SortControl(props) {
             </FormControl>
         </Paper>
     );
-}
-
-
+};
 
 export default compose(
     withStyles(styles),
