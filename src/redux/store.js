@@ -9,7 +9,7 @@ export const store = createStore(
   );
 
 store.subscribe(() => {
-    console.log('-***- subscription fired -***-');
+    console.log('-***- subscription console start -***-');
     console.log(arguments);
     console.log(store.getState());
     console.log('-***- subscription console end -***-');
