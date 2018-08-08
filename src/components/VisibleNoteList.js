@@ -6,12 +6,8 @@ import { getFilteredOrderedNotes } from '../redux/selectors';
 
 import NoteList from './NoteList';
 
-const mapStateToProps = state => ({
-  notes: getFilteredOrderedNotes(state)
-});
-
 const VisibleNoteList = props => (
   <NoteList notes={props.notes} />
 );
 
-export default connect(mapStateToProps, null)(VisibleNoteList);
+export default connect(getFilteredOrderedNotes, null)(VisibleNoteList);

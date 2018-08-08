@@ -21,7 +21,10 @@ export const getFilteredOrderedNotes = createSelector(
   (notes, filters) => {
     const sortBy = filters.get('sortBy'),
       sortOrder = filters.get('sortOrder');
-    return notes.sort(comparator);
+
+    return {
+      notes: notes.sort(comparator)
+    };
 
     function comparator(a, b) {
       const aProp = a.get(sortBy).toLowerCase();

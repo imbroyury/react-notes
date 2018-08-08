@@ -11,7 +11,7 @@ import Select from '@material-ui/core/Select';
 
 import compose from 'recompose/compose';
 import { connect } from 'react-redux';
-import { changeSortBy, changeSortOrder } from '../redux/actions';
+import { changeSortProps } from '../redux/actions';
 
 const styles = () => ({
     paper: {
@@ -43,14 +43,6 @@ const mapStateToProps = state => {
         sortValue
     }
 }
-
-// PROBLEM : DISPATCHING 2 ACTIONS PER VALUE CHANGE
-// SOLUTION : THUNKS ????
-
-const changeSortProps = (sortBy, sortOrder) => dispatch => {
-    dispatch(changeSortBy(sortBy));
-    dispatch(changeSortOrder(sortOrder));
-};
 
 const mapDispatchToProps = dispatch => ({
     handleSortChange: e => {

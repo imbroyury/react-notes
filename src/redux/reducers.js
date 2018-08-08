@@ -1,40 +1,25 @@
-import uuidv4 from 'uuid/v4';
-import { ADD_NOTE, DEL_NOTE, EDIT_NOTE, UPDATE_SEARCH_QUERY, SWITCH_NOTE_MODE, CHANGE_SORT_BY, CHANGE_SORT_ORDER } from './actions';
+
+import { ADD_ALL_NOTES, ADD_NOTE, DEL_NOTE, EDIT_NOTE, UPDATE_SEARCH_QUERY, SWITCH_NOTE_MODE, CHANGE_SORT_BY, CHANGE_SORT_ORDER, SET_LOAD_STATUS } from './actions';
 import { combineReducers } from 'redux-immutable';
 
 import Immutable from 'immutable';
 
 // INITIAL STATE​
 const initialState = Immutable.fromJS({
-    notes: [{
-        title: 'Sample First Note',
-        body: 'Note body Lorem ipsum dolor sit, amet consectetur adipisicing elit. Voluptatum aspernatur nobis et ullam, doloribus vel aliquam unde quaerat perferendis mollitia reiciendis dicta officia temporibus asperiores, magnam nesciunt sint odit quas? ',
-        id: "8af17bec-6e6a-4102-bb09-5745bc7d6e57",
-        updatedAt: "2018-08-03T08:48:32.611Z",
-        editMode: false
-    }, {
-        title: 'Second Sample Note',
-        body: 'note body Lorem ipsum dolor sit, amet consectetur adipisicing elit. Voluptatum aspernatur nobis et ullam, doloribus vel aliquam unde quaerat perferendis mollitia reiciendis dicta officia temporibus asperiores, magnam nesciunt sint odit quas?',
-        id: "9539963b-74ce-4ab1-b359-14b93beab9e4",
-        updatedAt: "2018-08-03T08:50:18.964Z",
-        editMode: false
-    }, {
-        title: 'Third Note',
-        body: 'note body Lorem ipsum dolor sit, amet consectetur adipisicing elit. Voluptatum aspernatur nobis et ullam, doloribus vel aliquam unde quaerat perferendis mollitia reiciendis dicta officia temporibus asperiores, magnam nesciunt sint odit quas?',
-        id: "5e57f81a-8842-4b8c-a27d-b50108119dd0",
-        updatedAt: "2018-08-03T08:50:27.441Z",
-        editMode: false
-    }],
+    notes: [],
     filters: {
         searchQuery: '',
         // updatedAt or title
         sortBy: 'updatedAt',
         // ascending or descending
         sortOrder: 'descending'
-    }
+    },
+    // could be 'inProgress', 'error' or 'success'
+    loadStatus: 'success'
 });
 
 console.log(initialState);
+
 
 /**
 |--------------------------------------------------
@@ -44,6 +29,8 @@ console.log(initialState);
 
 function notes(state = initialState.get('notes'), action) {
     switch (action.type) {
+        case ADD_ALL_NOTES:
+            return addAllNotes(state, action);
         case ADD_NOTE:
             return addNote(state, action);
         case DEL_NOTE:
@@ -57,34 +44,32 @@ function notes(state = initialState.get('notes'), action) {
     }
 }
 
-function addNote(notes, action) {
-    return notes.push(Immutable.Map({
-        title: action.title,
-        body: action.body,
-        id: uuidv4(),
-        updatedAt: new Date().toISOString(),
-        editMode: false
-    }));
+function addAllNotes(notes, { payload }) {
+    return Immutable.fromJS(payload.notes);
 }
 
-function deleteNote(notes, action) {
-    return notes.filter(note => note.get('id') !== action.id);
+function addNote(notes, { payload }) {
+    return notes.push(Immutable.Map(payload.note));
 }
 
-function editNote(notes, action) {
-    const ind = notes.findIndex(note => note.get('id') === action.id);
+function deleteNote(notes, { payload }) {
+    return notes.filter(note => note.get('id') !== payload.id);
+}
+
+function editNote(notes, { payload }) {
+    const ind = notes.findIndex(note => note.get('id') === payload.id);
     return ind === -1 ?
         notes :
         notes.update(ind, note => {
             return note
-                .update('title', () => action.title)
-                .update('body', () => action.body)
+                .update('title', () => payload.title)
+                .update('body', () => payload.body)
                 .update('updatedAt', () => new Date().toISOString());
         });
 }
 
-function switchNoteMode(notes, action) {
-    const ind = notes.findIndex(note => note.get('id') === action.id);
+function switchNoteMode(notes, { payload }) {
+    const ind = notes.findIndex(note => note.get('id') === payload.id);
     return ind === -1 ?
         notes :
         notes.update(ind, note => note.update('editMode', value => !value));
@@ -109,21 +94,43 @@ function filters(state = initialState.get('filters'), action) {
     }
 }
 
-function updateSearchQuery(filters, action) {
-    return filters.update('searchQuery', () => action.searchQuery);
+function updateSearchQuery(filters, { payload }) {
+    return filters.update('searchQuery', () => payload.searchQuery);
 }
 
-function changeSortBy(filters, action) {
-    return filters.update('sortBy', () => action.sortBy);
+function changeSortBy(filters, { payload }) {
+    return filters.update('sortBy', () => payload.sortBy);
 }
 
-function changeSortOrder(filters, action) {
-    return filters.update('sortOrder', () => action.sortOrder);
+function changeSortOrder(filters, { payload }) {
+    return filters.update('sortOrder', () => payload.sortOrder);
+}
+
+/**
+|--------------------------------------------------
+| STATUS-RELATED REDUCERS
+|--------------------------------------------------
+*/
+
+const loadStatusMap = {
+    LOAD_START: 'inProgress',
+    LOAD_ERROR: 'error',
+    LOAD_SUCCESS: 'success'
+}
+
+function loadStatus(state = initialState.get('loadStatus'), action) {
+    switch (action.type) {
+        case SET_LOAD_STATUS:
+            return loadStatusMap[action.payload.status];
+        default:
+            return state;
+    }
 }
 
 const notesApp = combineReducers({
     notes,
-    filters
+    filters,
+    loadStatus
 });
 
 export default notesApp;
